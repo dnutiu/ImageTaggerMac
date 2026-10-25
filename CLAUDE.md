@@ -1,0 +1,109 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+ImageTagger is a SwiftUI macOS app that predicts keyword tags for photos with a Core ML model and can save them into the
+files' metadata. It's a port of the Java/Kotlin app at https://github.com/dnutiu/ImageTagger.
+
+## Commands
+
+```shell
+# Build
+xcodebuild -project ImageTagger.xcodeproj -scheme ImageTagger -destination 'platform=macOS' build
+
+# Unit tests (Swift Testing)
+xcodebuild -project ImageTagger.xcodeproj -scheme ImageTagger -destination 'platform=macOS' -only-testing:ImageTaggerTests test
+
+# One suite, or one test
+xcodebuild ... -only-testing:ImageTaggerTests/XMPSidecarTests test
+xcodebuild ... -only-testing:'ImageTaggerTests/TagFormatTests/comma()' test
+
+# Failure messages from a run (pass -resultBundlePath to xcodebuild to choose the path)
+xcrun xcresulttool get test-results summary --path <path>.xcresult
+```
+
+- **The Core ML model must be generated first.** `ImageTagger/Resources/TagPrediction.mlpackage` is gitignored (116 MB
+  of weights). Generate it from the ONNX model in the original project's AIModels release with
+  `Scripts/convert_model.py` (see README.md). Without it the app builds, but tagging fails with a model-missing error.
+- **UI tests** (`ImageTaggerUITests`) need macOS automation authorization. In a non-interactive shell they fail with
+  "Timed out while enabling automation mode", so run unit tests with `-only-testing:ImageTaggerTests`.
+- **Tests only build in Debug.** `@testable import` needs `ENABLE_TESTABILITY`.
+- There's no linter or formatter configured.
+- **Logs:** use `/usr/bin/log`, not `log` (a zsh builtin). App errors are logged with subsystem
+  `nuculabs.dev.ImageTagger`, for example
+  `/usr/bin/log show --last 5m --predicate 'subsystem == "nuculabs.dev.ImageTagger"'`.
+
+## Project setup
+
+- **File-system synchronized groups:** files added to `ImageTagger/`, `ImageTaggerTests/` or `ImageTaggerUITests/`
+  join their target automatically, so the pbxproj doesn't need editing. Images, `.dng` and `.xmp` files in those
+  folders become bundle resources.
+- **Info.plist:** `ImageTagger-Info.plist` is at the repo root, outside the synchronized folder, so it isn't copied as a
+  resource. It's merged with the generated Info.plist and declares the image and folder document types the app opens
+  from Finder, plus `.xmp` as a related item type.
+- **Core ML code generation is off** (`COREML_CODEGEN_LANGUAGE = None`). The model is loaded by URL as
+  `TagPrediction.mlmodelc`.
+- **Swift 6 with `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor` and approachable concurrency.** Everything is main-actor
+  isolated unless marked otherwise. Types used off the main actor are declared `nonisolated`, and functions that do
+  heavy work (image decoding, inference, file writes) are `@concurrent`. Without `@concurrent`, a `nonisolated async`
+  function runs on the caller's actor, which is usually the main actor.
+- **App Sandbox:** read-write access to user-selected files only (`ENABLE_USER_SELECTED_FILES = readwrite`).
+
+## Architecture
+
+**Model pipeline (`ImageTagger/Model`).** `Scripts/convert_model.py` wraps the ONNX ResNet with ImageNet normalization
+and a sigmoid, embeds the 1708 labels as a Core ML classifier, and stores FP16 weights. INT8 weights changed the
+predictions, so they aren't used. `TagPredictor` runs it through Vision's `CoreMLRequest` with `.centerCrop`. Tags are
+the labels above `confidenceThreshold` (0.3775, which is sigmoid(-0.5), the original logit threshold), sorted
+alphabetically. `TagPredictor.shared` loads the model once. `ImageAnalyzer` downsamples with ImageIO (orientation
+applied), predicts, and reads `ImageMetadata`.
+
+The Java original fed the red channel to all three color channels. This port uses real RGB, so its predictions
+intentionally differ from the original's tests.
+
+**Session (`ImageTagger/Session`).** `TaggingSession` is the single `@Observable` app state. `AppDelegate` owns it, so
+files opened from Finder or dropped on the Dock icon (`application(_:open:)`) reach it. The app has one `Window` scene
+and quits when it closes.
+
+- **Adding:** `add(_:)` expands folders recursively, skips duplicates, and starts security-scoped access.
+- **Analysis:** `ImageItem`s go into a queue. One `analysisTask` runs a task group with bounded parallelism and restarts
+  itself if images arrive while a cancelled run is still winding down.
+- **Cancelling:** removes the images that aren't finished.
+- **Views:** they read the session from the environment. Menu commands in `ImageTaggerCommands` get it passed in.
+- **Settings:** stored in `UserDefaults` under `TagFormat.storageKey` and `TaggingSession.savesTagsAutomaticallyKey`.
+
+**Saving tags** merges the predicted tags into the keywords already in the file, case-insensitively. Nothing is ever
+removed.
+
+- **`ImageKeywords`, embedded keywords:** for JPEG, HEIC and TIFF it writes XMP `dc:subject` with
+  `CGImageDestinationCopyImageSource`, which doesn't re-encode the image. ImageIO also updates an IPTC IIM block if one
+  exists, but doesn't create one. PNG reports success while dropping the keywords, which is why every write is read
+  back before the original is replaced.
+- **`XMPSidecar`, RAW images:** for any `UTType.rawImage` it writes `IMG_1234.xmp` next to `IMG_1234.CR2`, and the RAW
+  file is never modified. Existing sidecars are edited through `CGImageMetadata`, which keeps the other metadata
+  semantically intact (develop settings and history), and their `xmp:MetadataDate` is updated. New sidecars start with
+  the RAW's embedded keywords. A sidecar that can't be read or parsed must never be treated as missing, or it would be
+  overwritten.
+- **Sandbox access to sidecars:** when only the RAW file was opened, the sidecar is reached through an `NSFilePresenter`
+  with `primaryPresentedItemURL` plus `NSFileCoordinator` (`RelatedFileCoordinator`). The `.xmp` related item type in
+  `ImageTagger-Info.plist` uses `CFBundleTypeExtensions`. The `LSItemContentTypes` form wasn't granted access in testing.
+- **Writing files:** an atomic `replaceItemAt` from the item replacement directory when the folder is accessible.
+  Otherwise the file is rewritten in place, and the original bytes are restored if the write fails.
+
+## Tests
+
+- **Hosted tests share the app's environment.** Unit tests run inside the sandboxed app (`TEST_HOST`), so `Bundle.main`
+  holds the model and the tests share the app's container and `UserDefaults`. Create sessions with `makeSession()`
+  (`TestResources.swift`), which uses an isolated defaults suite, so the user's settings, such as auto-save, can't
+  affect tests.
+- **Never write to bundled fixtures.** Copy them into a `withTemporaryDirectory` directory first with
+  `copy(_:to:)`. Fixtures are the three `TestImage` JPEGs, `timisoara-water-tower.dng` (a generated Bayer DNG) and
+  `lightroom-sidecar.xmp` (a Lightroom Classic style sidecar).
+- **Predictor tests check stable subsets of tags.** Tags near the threshold, like "river" on the night photo, flip with
+  the resampling method.
+- **Compiler crash workaround:** Swift 6.3 crashed (`SendNonSendable` pass) on test closures passed to
+  `withTemporaryDirectory` that captured a `UserDefaults`. Create such objects outside the closure.
+- **Sandboxed file access isn't covered by unit tests,** because the container has full access. Verify it end to end by
+  opening files from outside the container with `open -a <built app> <files>`, with auto-save enabled in
+  `~/Library/Containers/nuculabs.dev.ImageTagger/Data/Library/Preferences/nuculabs.dev.ImageTagger.plist`. Then check
+  the files on disk, and reset the preference afterwards.
