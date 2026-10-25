@@ -1,0 +1,5 @@
+coremltools==9.0
+numpy==2.0.2
+onnx==1.19.1
+onnx2torch==1.5.15
+torch==2.8.0

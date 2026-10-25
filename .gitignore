@@ -1,0 +1,8 @@
+.DS_Store
+xcuserdata/
+DerivedData/
+.venv/
+
+# The Core ML model is too large for GitHub (116 MB of weights).
+# Generate it with Scripts/convert_model.py, see README.md.
+ImageTagger/Resources/TagPrediction.mlpackage/
