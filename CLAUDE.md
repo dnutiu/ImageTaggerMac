@@ -20,6 +20,9 @@ xcodebuild ... -only-testing:'ImageTaggerTests/TagFormatTests/comma()' test
 
 # Failure messages from a run (pass -resultBundlePath to xcodebuild to choose the path)
 xcrun xcresulttool get test-results summary --path <path>.xcresult
+
+# Notarized DMG in build/release, and optionally a GitHub release (see README.md)
+Scripts/release.sh [--publish <notes.md>] [--app <notarized ImageTagger.app>]
 ```
 
 - **The Core ML model's weights are in Git LFS.** `TagPrediction.mlpackage/Data/com.apple.CoreML/weights/weight.bin`

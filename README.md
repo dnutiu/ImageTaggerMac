@@ -92,6 +92,22 @@ The conversion wraps the network with ImageNet normalization and a sigmoid outpu
 stores the weights as 16-bit floats. Its predictions match the original 32-bit ONNX model. 8-bit weights would halve
 the size, but they changed the predicted tags.
 
+## Releasing
+
+`Scripts/release.sh` archives the app, signs it with the team's Developer ID certificate, has Apple notarize it, and
+creates `build/release/ImageTagger-<version>.dmg`. It uses the Apple Account signed in to Xcode, so it doesn't need a
+notarization password. Before finishing, it checks that the app in the DMG opens like an app downloaded from the
+internet.
+
+```shell
+Scripts/release.sh                                # Create the DMG
+Scripts/release.sh --publish release-notes.md     # Also publish it as the v<version> GitHub release
+Scripts/release.sh --app path/to/ImageTagger.app  # Create the DMG from an app that's already notarized
+```
+
+The version is the app's `MARKETING_VERSION`. Notarization usually takes a few minutes, but it can take much longer,
+so the script waits up to 3 hours (set `NOTARIZATION_TIMEOUT_MINUTES` to change it).
+
 ## Project structure
 
 | Path | Purpose |
