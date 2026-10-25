@@ -1,5 +1,7 @@
 # Image Tagger for macOS
 
+[![CI](https://github.com/dnutiu/ImageTaggerMac/actions/workflows/ci.yml/badge.svg)](https://github.com/dnutiu/ImageTaggerMac/actions/workflows/ci.yml)
+
 Image Tagger predicts an image's keywords using a deep learning model based on ResNet. It helps photographers
 automate the image tagging process. 📸
 
@@ -108,6 +110,29 @@ Scripts/release.sh --app path/to/ImageTagger.app  # Create the DMG from an app t
 The version is the app's `MARKETING_VERSION`. Notarization usually takes a few minutes, but it can take much longer,
 so the script waits up to 3 hours (set `NOTARIZATION_TIMEOUT_MINUTES` to change it).
 
+### GitHub Actions
+
+The **CI** workflow builds the app and runs the unit tests for every push to `main` and every pull request. The model is
+cached between runs, so it isn't downloaded from Git LFS every time.
+
+The **Release** workflow runs `Scripts/release.sh --publish` when a version tag is pushed. The tag has to match the
+app's version, and the message of an annotated tag becomes the release notes:
+
+```shell
+git tag -a v1.1 -m "What's new in this release"
+git push origin v1.1
+```
+
+On GitHub the script can't use an Xcode account, so it signs and notarizes with an App Store Connect API key instead.
+Create a team key with the Admin role in App Store Connect › Users and Access › Integrations, and add it to the
+repository's secrets:
+
+```shell
+gh secret set APP_STORE_CONNECT_KEY < AuthKey_<key ID>.p8
+gh secret set APP_STORE_CONNECT_KEY_ID --body <key ID>
+gh secret set APP_STORE_CONNECT_ISSUER_ID --body <issuer ID>
+```
+
 ## Project structure
 
 | Path | Purpose |
@@ -117,7 +142,8 @@ so the script waits up to 3 hours (set `NOTARIZATION_TIMEOUT_MINUTES` to change 
 | `ImageTagger/Views` | The SwiftUI sidebar, image preview and inspector. |
 | `ImageTagger/ImageTaggerCommands.swift` | The menu bar commands. |
 | `ImageTagger-Info.plist` | Declares the image and folder types the app can open, and XMP sidecars as related items. It's merged with the generated Info.plist. |
-| `Scripts` | Converts the ONNX model to Core ML. |
+| `Scripts` | Converts the ONNX model to Core ML, and builds notarized releases. |
+| `.github` | The CI and Release workflows. |
 
 ## Differences from the Java version
 

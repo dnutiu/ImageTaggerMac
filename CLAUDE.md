@@ -25,6 +25,14 @@ xcrun xcresulttool get test-results summary --path <path>.xcresult
 Scripts/release.sh [--publish <notes.md>] [--app <notarized ImageTagger.app>]
 ```
 
+- **CI** (`.github/workflows/ci.yml`, `macos-26` runner with Xcode 26.6) runs the unit tests signed ad hoc
+  (`CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM=`), because the runner has no certificates. The
+  `download-model` action caches the Git LFS weights to save LFS bandwidth.
+- **Releases:** `Scripts/release.sh` archives ad hoc and lets the Developer ID export re-sign the app (cloud-managed
+  certificate), then waits for notarization. Locally it uses the Xcode account. The Release workflow
+  (`.github/workflows/release.yml`, on `v*` tags) passes an App Store Connect API key through the
+  `APP_STORE_CONNECT_KEY_PATH`, `APP_STORE_CONNECT_KEY_ID` and `APP_STORE_CONNECT_ISSUER_ID` environment variables.
+
 - **The Core ML model's weights are in Git LFS.** `TagPrediction.mlpackage/Data/com.apple.CoreML/weights/weight.bin`
   (116 MB) is too large for regular git. If it's a small text pointer file instead, run `git lfs pull`. Without the
   real weights the app builds, but tagging fails. `Scripts/convert_model.py` regenerates the model from the original

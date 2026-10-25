@@ -1,0 +1,72 @@
+name: Release
+
+# Publishes a notarized DMG when a version tag is pushed, for example:
+#   git tag -a v1.1 -m "Release notes"
+#   git push origin v1.1
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Notarize and publish
+    runs-on: macos-26
+    # Notarization usually takes minutes, but can take hours.
+    timeout-minutes: 240
+    steps:
+      # The full history lets the release script check that the tagged commit is on a branch.
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/download-model
+
+      - name: Select Xcode
+        run: sudo xcode-select --switch /Applications/Xcode_26.6.app
+
+      - name: Check the version
+        run: |
+          version=$(xcodebuild -project ImageTagger.xcodeproj -scheme ImageTagger -showBuildSettings \
+            | awk '$1 == "MARKETING_VERSION" { print $3; exit }')
+          if [[ "$GITHUB_REF_NAME" != "v$version" ]]; then
+            echo "::error::The tag $GITHUB_REF_NAME doesn't match the app's version $version."
+            exit 1
+          fi
+
+      # The notes are the message of an annotated tag. A lightweight tag has no message.
+      - name: Write the release notes
+        run: |
+          git fetch --force origin "refs/tags/$GITHUB_REF_NAME:refs/tags/$GITHUB_REF_NAME"
+          : > "$RUNNER_TEMP/notes.md"
+          if [[ "$(git cat-file -t "refs/tags/$GITHUB_REF_NAME")" == tag ]]; then
+            git tag --list --format='%(contents)' "$GITHUB_REF_NAME" > "$RUNNER_TEMP/notes.md"
+          fi
+          if [[ -z "$(tr -d '[:space:]' < "$RUNNER_TEMP/notes.md")" ]]; then
+            echo "ImageTagger ${GITHUB_REF_NAME#v}." > "$RUNNER_TEMP/notes.md"
+          fi
+
+      - name: Notarize and publish
+        env:
+          APP_STORE_CONNECT_KEY: ${{ secrets.APP_STORE_CONNECT_KEY }}
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [[ -z "$APP_STORE_CONNECT_KEY" || -z "$APP_STORE_CONNECT_KEY_ID" || -z "$APP_STORE_CONNECT_ISSUER_ID" ]]; then
+            echo "::error::Add the App Store Connect API key secrets, as described in the README."
+            exit 1
+          fi
+          export APP_STORE_CONNECT_KEY_PATH="$RUNNER_TEMP/AuthKey.p8"
+          printf '%s\n' "$APP_STORE_CONNECT_KEY" > "$APP_STORE_CONNECT_KEY_PATH"
+          Scripts/release.sh --publish "$RUNNER_TEMP/notes.md"
+
+      - name: Upload the DMG
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ImageTagger
+          path: build/release/*.dmg
+          if-no-files-found: ignore

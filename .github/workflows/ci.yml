@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Build and test
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ./.github/actions/download-model
+
+      - name: Select Xcode
+        run: sudo xcode-select --switch /Applications/Xcode_26.6.app
+
+      # The runner has no signing certificate, so the app and the tests are signed ad hoc.
+      - name: Run the unit tests
+        run: >
+          xcodebuild test
+          -project ImageTagger.xcodeproj -scheme ImageTagger -destination 'platform=macOS'
+          -only-testing:ImageTaggerTests -resultBundlePath build/TestResults.xcresult
+          CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM=
+
+      - name: Upload the test results
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: TestResults
+          path: build/TestResults.xcresult

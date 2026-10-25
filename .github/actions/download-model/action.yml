@@ -1,0 +1,19 @@
+name: Download the Core ML model
+description: >
+  Downloads the model's weights from Git LFS. They're cached between runs, because every download of the 116 MB
+  file counts against the repository's LFS bandwidth quota.
+runs:
+  using: composite
+  steps:
+    - name: Get the cache key
+      id: lfs
+      shell: bash
+      run: echo "key=lfs-$(git lfs ls-files --long | cut -d ' ' -f 1 | sort | shasum -a 256 | cut -c 1-16)" >> "$GITHUB_OUTPUT"
+    - name: Restore the LFS cache
+      uses: actions/cache@v6
+      with:
+        path: .git/lfs
+        key: ${{ steps.lfs.outputs.key }}
+    - name: Download the LFS files
+      shell: bash
+      run: git lfs pull

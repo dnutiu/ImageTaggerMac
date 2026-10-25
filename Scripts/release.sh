@@ -3,8 +3,10 @@
 # Builds a notarized DMG of ImageTagger, and optionally publishes it as a GitHub release.
 #
 # The app is signed with the team's Developer ID certificate and notarized with the Apple Account that's signed in
-# to Xcode (Xcode › Settings › Apple Accounts), so no notarization password is needed. Notarization usually takes a
-# few minutes, but it can take much longer, especially for a team's first submissions.
+# to Xcode (Xcode › Settings › Apple Accounts), so no notarization password is needed. Without an Xcode account, as on
+# GitHub Actions, set APP_STORE_CONNECT_KEY_PATH, APP_STORE_CONNECT_KEY_ID and APP_STORE_CONNECT_ISSUER_ID to use an
+# App Store Connect API key instead. Notarization usually takes a few minutes, but it can take much longer,
+# especially for a team's first submissions.
 #
 # Usage:
 #   Scripts/release.sh                          Archive, notarize, and create build/release/ImageTagger-<version>.dmg
@@ -43,6 +45,16 @@ if [[ -n "$NOTES" ]]; then
     [[ -n "$(git branch --remotes --contains HEAD)" ]] || fail "push the current commit first, so the release can be tagged"
 fi
 
+# Authenticates xcodebuild with an App Store Connect API key, when one is set.
+AUTHENTICATION=()
+if [[ -n "${APP_STORE_CONNECT_KEY_PATH:-}" ]]; then
+    AUTHENTICATION=(
+        -authenticationKeyPath "$APP_STORE_CONNECT_KEY_PATH"
+        -authenticationKeyID "${APP_STORE_CONNECT_KEY_ID:?set APP_STORE_CONNECT_KEY_ID}"
+        -authenticationKeyIssuerID "${APP_STORE_CONNECT_ISSUER_ID:?set APP_STORE_CONNECT_ISSUER_ID}"
+    )
+fi
+
 TEMPORARY=$(mktemp -d)
 trap 'hdiutil detach "$TEMPORARY/mount" -quiet 2>/dev/null || true; rm -rf "$TEMPORARY"' EXIT
 mkdir -p "$OUTPUT"
@@ -54,17 +66,20 @@ if [[ -z "$APP" ]]; then
 
     echo "==> Archiving"
     rm -rf "$ARCHIVE" "$OUTPUT/notarized"
+    # The archive is signed ad hoc, so no development certificate is needed. The export signs it with Developer ID.
     xcodebuild archive -project ImageTagger.xcodeproj -scheme ImageTagger -configuration Release \
-        -destination 'generic/platform=macOS' -archivePath "$ARCHIVE" -quiet
+        -destination 'generic/platform=macOS' -archivePath "$ARCHIVE" \
+        CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual -quiet
 
     echo "==> Signing with Developer ID and uploading for notarization"
     xcodebuild -exportArchive -archivePath "$ARCHIVE" -exportOptionsPlist Scripts/ExportOptions.plist \
-        -exportPath "$TEMPORARY/upload" -allowProvisioningUpdates -quiet
+        -exportPath "$TEMPORARY/upload" -allowProvisioningUpdates \
+        ${AUTHENTICATION[@]+"${AUTHENTICATION[@]}"} -quiet
 
     echo "==> Waiting for notarization (up to $NOTARIZATION_TIMEOUT_MINUTES minutes)"
     deadline=$((SECONDS + NOTARIZATION_TIMEOUT_MINUTES * 60))
     until xcodebuild -exportNotarizedApp -archivePath "$ARCHIVE" -exportPath "$OUTPUT/notarized" \
-        > "$OUTPUT/notarization.log" 2>&1; do
+        ${AUTHENTICATION[@]+"${AUTHENTICATION[@]}"} > "$OUTPUT/notarization.log" 2>&1; do
         if ! grep -q "is processing" "$OUTPUT/notarization.log"; then
             cat "$OUTPUT/notarization.log" >&2
             fail "notarization failed, see Xcode › Window › Organizer for details"
