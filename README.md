@@ -6,6 +6,11 @@ automate the image tagging process. 📸
 This is a native macOS port of the Java/Kotlin [ImageTagger](https://github.com/dnutiu/ImageTagger), written in
 SwiftUI, with the tagging model running on Core ML.
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshot-dark.png">
+  <img alt="ImageTagger showing a photo of orange berries, its predicted tags, and the camera metadata in the inspector" src="docs/screenshot-light.png">
+</picture>
+
 ## Features
 
 - Add photos with **File › Add Images…** (⌘O), by dragging images or folders onto the window or the Dock icon, or
