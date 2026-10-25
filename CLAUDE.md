@@ -22,9 +22,10 @@ xcodebuild ... -only-testing:'ImageTaggerTests/TagFormatTests/comma()' test
 xcrun xcresulttool get test-results summary --path <path>.xcresult
 ```
 
-- **The Core ML model must be generated first.** `ImageTagger/Resources/TagPrediction.mlpackage` is gitignored (116 MB
-  of weights). Generate it from the ONNX model in the original project's AIModels release with
-  `Scripts/convert_model.py` (see README.md). Without it the app builds, but tagging fails with a model-missing error.
+- **The Core ML model's weights are in Git LFS.** `TagPrediction.mlpackage/Data/com.apple.CoreML/weights/weight.bin`
+  (116 MB) is too large for regular git. If it's a small text pointer file instead, run `git lfs pull`. Without the
+  real weights the app builds, but tagging fails. `Scripts/convert_model.py` regenerates the model from the original
+  project's ONNX model (see README.md).
 - **UI tests** (`ImageTaggerUITests`) need macOS automation authorization. In a non-interactive shell they fail with
   "Timed out while enabling automation mode", so run unit tests with `-only-testing:ImageTaggerTests`.
 - **Tests only build in Debug.** `@testable import` needs `ENABLE_TESTABILITY`.

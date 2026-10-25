@@ -52,7 +52,27 @@ and Windows show as keywords or tags. Existing keywords are kept, and tags that 
 
 ## Building
 
-The Core ML model isn't checked in because it's too large for GitHub. Generate it once from the ONNX model:
+The Core ML model's weights (116 MB) are stored with [Git LFS](https://git-lfs.com), because GitHub doesn't allow
+files over 100 MB in a repository. Install Git LFS before cloning, so the model is downloaded with the code:
+
+```shell
+brew install git-lfs
+git lfs install
+git clone https://github.com/dnutiu/ImageTaggerMac.git
+```
+
+If you cloned without Git LFS, run `git lfs pull` in the repository to download the model.
+
+Open `ImageTagger.xcodeproj` and run the **ImageTagger** scheme, or build from the command line:
+
+```shell
+xcodebuild -project ImageTagger.xcodeproj -scheme ImageTagger build
+xcodebuild -project ImageTagger.xcodeproj -scheme ImageTagger test
+```
+
+### Regenerating the model
+
+`ImageTagger/Resources/TagPrediction.mlpackage` is converted from the ONNX model of the Java version:
 
 1. Download the AIModels archive from the
    [ImageTagger releases page](https://github.com/dnutiu/ImageTagger/releases). It contains `prediction.onnx` and
@@ -66,13 +86,6 @@ The Core ML model isn't checked in because it's too large for GitHub. Generate i
        --onnx path/to/prediction.onnx \
        --labels path/to/prediction_categories.txt \
        --output ImageTagger/Resources/TagPrediction.mlpackage
-   ```
-
-3. Open `ImageTagger.xcodeproj` and run the **ImageTagger** scheme, or build from the command line:
-
-   ```shell
-   xcodebuild -project ImageTagger.xcodeproj -scheme ImageTagger build
-   xcodebuild -project ImageTagger.xcodeproj -scheme ImageTagger test
    ```
 
 The conversion wraps the network with ImageNet normalization and a sigmoid output, embeds the 1708 tag names, and
