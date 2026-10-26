@@ -55,9 +55,13 @@ and Windows show as keywords or tags. Existing keywords are kept, and tags that 
 
 ## Command line
 
-The app includes the `imagetagger` command, which tags images and saves their tags to the files, like
-**Save Tags to All Images** in the app. To install it, choose **ImageTagger › Install Command Line Tool…** and run the
-command it shows in the Terminal. It links the command into `/usr/local/bin`:
+The app from the [GitHub releases](https://github.com/dnutiu/ImageTaggerMac/releases) includes the `imagetagger`
+command, which tags images and saves their tags to the files, like **Save Tags to All Images** in the app. The Mac App
+Store version doesn't include it, because every executable in a Mac App Store app has to be sandboxed, and a sandboxed
+command couldn't read the images in the Terminal's current folder.
+
+To install it, choose **ImageTagger › Install Command Line Tool…** and run the command it shows in the Terminal. It
+links the command into `/usr/local/bin`:
 
 ```shell
 sudo mkdir -p /usr/local/bin
@@ -149,6 +153,13 @@ Scripts/release.sh --app path/to/ImageTagger.app  # Create the DMG from an app t
 
 The version is the app's `MARKETING_VERSION`. Notarization usually takes a few minutes, but it can take much longer,
 so the script waits up to 3 hours (set `NOTARIZATION_TIMEOUT_MINUTES` to change it).
+
+### Mac App Store
+
+Archive the app in Xcode with **Product › Archive**, and upload it from the Organizer with **Distribute App › App Store
+Connect**. Release builds leave out the `imagetagger` command, which isn't sandboxed, so the archive can be uploaded as
+is. `Scripts/release.sh` builds with `EMBEDS_COMMAND_LINE_TOOL=YES` to include it in the DMG, and the
+**Install Command Line Tool…** menu item is only shown when the app includes it.
 
 ### GitHub Actions
 

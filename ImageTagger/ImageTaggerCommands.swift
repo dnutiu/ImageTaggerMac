@@ -18,8 +18,10 @@ struct ImageTaggerCommands: Commands {
         }
 
         CommandGroup(after: .appSettings) {
-            Button("Install Command Line Tool…") {
-                CommandLineTool.showInstallInstructions()
+            if CommandLineTool.isEmbedded {
+                Button("Install Command Line Tool…") {
+                    CommandLineTool.showInstallInstructions()
+                }
             }
         }
 

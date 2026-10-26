@@ -67,9 +67,10 @@ if [[ -z "$APP" ]]; then
     echo "==> Archiving"
     rm -rf "$ARCHIVE" "$OUTPUT/notarized"
     # The archive is signed ad hoc, so no development certificate is needed. The export signs it with Developer ID.
+    # Release builds leave out the imagetagger command for the Mac App Store, so the DMG asks for it.
     xcodebuild archive -project ImageTagger.xcodeproj -scheme ImageTagger -configuration Release \
         -destination 'generic/platform=macOS' -archivePath "$ARCHIVE" \
-        CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual -quiet
+        CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual EMBEDS_COMMAND_LINE_TOOL=YES -quiet
 
     echo "==> Signing with Developer ID and uploading for notarization"
     xcodebuild -exportArchive -archivePath "$ARCHIVE" -exportOptionsPlist Scripts/ExportOptions.plist \

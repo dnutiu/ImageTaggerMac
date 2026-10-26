@@ -74,6 +74,11 @@ Scripts/release.sh [--publish <notes.md>] [--app <notarized ImageTagger.app>]
   - **Shared files:** it compiles the `ImageTagger/Model` files through a membership exception set on the `ImageTagger`
     folder, so a new Model file the command needs must be added to it (Target Membership in Xcode).
   - **Not sandboxed:** it has the hardened runtime, and `SKIP_INSTALL = YES` keeps archives app archives.
+  - **Mac App Store:** every executable in a Mac App Store app has to be sandboxed, so Release builds leave the command
+    out: `EMBEDS_COMMAND_LINE_TOOL` is `YES` in Debug and `NO` in Release, and when it's `NO`,
+    `EXCLUDED_SOURCE_FILE_NAMES` skips `imagetagger` in the Embed Command Line Tool phase. An archive made in Xcode
+    can be uploaded to App Store Connect as is. `Scripts/release.sh` passes `EMBEDS_COMMAND_LINE_TOOL=YES` for the
+    DMG, and the menu item is only shown when `CommandLineTool.isEmbedded`.
   - **Names:** it isn't in `Contents/MacOS`, and its module is `ImageTaggerCLI`, because `imagetagger` and
     `ImageTagger` are the same name on case-insensitive file systems.
   - **Entitlements:** the Developer ID export adds `com.apple.application-identifier` to it. It runs without a

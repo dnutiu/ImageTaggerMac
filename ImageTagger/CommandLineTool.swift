@@ -12,6 +12,15 @@ enum CommandLineTool {
         Bundle.main.bundleURL.appending(path: "Contents/Helpers/imagetagger")
     }
 
+    /// Whether the app includes the command.
+    ///
+    /// Release builds leave it out unless `EMBEDS_COMMAND_LINE_TOOL` is set, as `Scripts/release.sh` does, because
+    /// every executable in a Mac App Store app has to be sandboxed, and a sandboxed command couldn't read the images in
+    /// the Terminal's current folder.
+    static var isEmbedded: Bool {
+        FileManager.default.isExecutableFile(atPath: url.path)
+    }
+
     /// The Terminal command that links the command into `/usr/local/bin`, which is in the shell's search path.
     ///
     /// The app is sandboxed, so it can't create the link itself.

@@ -92,6 +92,10 @@ struct CommandLineToolTests {
         }
     }
 
+    @Test @MainActor func isEmbeddedInDebugBuilds() {
+        #expect(CommandLineTool.isEmbedded)
+    }
+
     @Test @MainActor func quotesPathsInTheInstallCommand() {
         #expect(CommandLineTool.shellQuoted("/Applications/ImageTagger.app") == "/Applications/ImageTagger.app")
         #expect(CommandLineTool.shellQuoted("/Users/me/My Apps/ImageTagger.app") == "'/Users/me/My Apps/ImageTagger.app'")
