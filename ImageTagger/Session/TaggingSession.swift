@@ -107,7 +107,7 @@ final class TaggingSession {
             securityScopedURLs.append(url)
         }
 
-        let files = await Self.imageFiles(in: urls)
+        let files = await ImageFinder.imageFiles(in: urls)
         var knownFiles = Set(items.map(\.url.standardizedFileURL))
         let newItems = files
             .filter { knownFiles.insert($0.standardizedFileURL).inserted }
@@ -298,36 +298,5 @@ final class TaggingSession {
             let values = try? url.resourceValues(forKeys: [.contentTypeKey])
             return values?.contentType.map { $0.conforms(to: .image) || $0.conforms(to: .folder) } ?? false
         }
-    }
-
-    /// Returns the image files in `urls`, searching folders and their subfolders.
-    @concurrent
-    nonisolated static func imageFiles(in urls: [URL]) async -> [URL] {
-        urls.flatMap { url in
-            let values = try? url.resourceValues(forKeys: [.isDirectoryKey, .isPackageKey])
-            if values?.isDirectory == true, values?.isPackage != true {
-                return imageFiles(inFolder: url)
-            }
-            return isImage(url) ? [url] : []
-        }
-    }
-
-    nonisolated private static func imageFiles(inFolder folder: URL) -> [URL] {
-        guard let enumerator = FileManager.default.enumerator(
-            at: folder,
-            includingPropertiesForKeys: [.contentTypeKey],
-            options: [.skipsHiddenFiles, .skipsPackageDescendants]
-        ) else {
-            return []
-        }
-        return enumerator
-            .compactMap { $0 as? URL }
-            .filter(isImage)
-            .sorted { $0.path.localizedStandardCompare($1.path) == .orderedAscending }
-    }
-
-    nonisolated private static func isImage(_ url: URL) -> Bool {
-        let values = try? url.resourceValues(forKeys: [.contentTypeKey])
-        return values?.contentType?.conforms(to: .image) ?? false
     }
 }

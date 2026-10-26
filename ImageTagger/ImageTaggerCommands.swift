@@ -17,6 +17,12 @@ struct ImageTaggerCommands: Commands {
             }
         }
 
+        CommandGroup(after: .appSettings) {
+            Button("Install Command Line Tool…") {
+                CommandLineTool.showInstallInstructions()
+            }
+        }
+
         CommandGroup(replacing: .newItem) {
             Button("Add Images…") {
                 session.isImporterPresented = true

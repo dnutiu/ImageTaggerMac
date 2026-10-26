@@ -109,6 +109,8 @@ nonisolated private enum RelatedFileCoordinator {
         }
     }
 
+    private static let isSandboxed = ProcessInfo.processInfo.environment["APP_SANDBOX_CONTAINER_ID"] != nil
+
     static func read<Result>(_ url: URL, relatedTo primaryURL: URL, _ body: (URL) throws -> Result) throws -> Result {
         try coordinate(url, relatedTo: primaryURL, writing: false, body)
     }
@@ -123,9 +125,17 @@ nonisolated private enum RelatedFileCoordinator {
         writing: Bool,
         _ body: (URL) throws -> Result
     ) throws -> Result {
-        let presenter = Presenter(url: url, relatedTo: primaryURL)
-        NSFileCoordinator.addFilePresenter(presenter)
-        defer { NSFileCoordinator.removeFilePresenter(presenter) }
+        // Outside the sandbox, as in the imagetagger command, related files are accessible without a presenter, and
+        // Foundation logs an error when a presenter's related file doesn't exist yet.
+        let presenter = isSandboxed ? Presenter(url: url, relatedTo: primaryURL) : nil
+        if let presenter {
+            NSFileCoordinator.addFilePresenter(presenter)
+        }
+        defer {
+            if let presenter {
+                NSFileCoordinator.removeFilePresenter(presenter)
+            }
+        }
 
         let coordinator = NSFileCoordinator(filePresenter: presenter)
         var coordinationError: NSError?
