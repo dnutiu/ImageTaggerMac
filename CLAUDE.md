@@ -21,6 +21,9 @@ xcodebuild ... -only-testing:'ImageTaggerTests/TagFormatTests/comma()' test
 # Failure messages from a run (pass -resultBundlePath to xcodebuild to choose the path)
 xcrun xcresulttool get test-results summary --path <path>.xcresult
 
+# The imagetagger command, built with the app (pass -derivedDataPath to xcodebuild to choose where)
+<DerivedData>/Build/Products/Debug/ImageTagger.app/Contents/Helpers/imagetagger --help
+
 # Notarized DMG in build/release, and optionally a GitHub release (see README.md)
 Scripts/release.sh [--publish <notes.md>] [--app <notarized ImageTagger.app>]
 ```
@@ -60,6 +63,17 @@ Scripts/release.sh [--publish <notes.md>] [--app <notarized ImageTagger.app>]
   heavy work (image decoding, inference, file writes) are `@concurrent`. Without `@concurrent`, a `nonisolated async`
   function runs on the caller's actor, which is usually the main actor.
 - **App Sandbox:** read-write access to user-selected files only (`ENABLE_USER_SELECTED_FILES = readwrite`).
+- **Command line tool:** the `ImageTaggerCLI` target (folder `ImageTaggerCLI/`) builds `imagetagger`, which the app
+  embeds at `Contents/Helpers/imagetagger` with code signing on copy.
+  - **Shared files:** it compiles the `ImageTagger/Model` files through a membership exception set on the `ImageTagger`
+    folder, so a new Model file the command needs must be added to it (Target Membership in Xcode).
+  - **Not sandboxed:** it has the hardened runtime, and `SKIP_INSTALL = YES` keeps archives app archives.
+  - **Names:** it isn't in `Contents/MacOS`, and its module is `ImageTaggerCLI`, because `imagetagger` and
+    `ImageTagger` are the same name on case-insensitive file systems.
+  - **Entitlements:** the Developer ID export adds `com.apple.application-identifier` to it. It runs without a
+    provisioning profile.
+  - **Coverage:** the auto-generated scheme enables code coverage, so the Debug build writes `default.profraw` into the
+    current folder. Release builds aren't instrumented.
 
 ## Architecture
 
@@ -102,6 +116,19 @@ removed.
 - **Writing files:** an atomic `replaceItemAt` from the item replacement directory when the folder is accessible.
   Otherwise the file is rewritten in place, and the original bytes are restored if the write fails.
 
+**Command line tool (`ImageTaggerCLI`).** `imagetagger [--dry-run] [--format <format>] [<path> ...]` tags the current
+folder by default. It parses its options by hand, without dependencies, and finds images with `ImageFinder` (also used
+by the session). It analyzes them in parallel, saves tags with `ImageKeywords.add` and prints `<path>: <tags>` in the
+order of the files. Errors and the summary go to the standard error.
+
+- **Model:** it loads the app's compiled model by resolving its own symbolic links up to `ImageTagger.app`.
+- **Exit status:** formats that can't store keywords, like PNG, don't fail the run. Other errors exit with 1, and
+  invalid options with 64.
+- **Sidecars:** `XMPSidecar` only uses its file presenter when sandboxed (`APP_SANDBOX_CONTAINER_ID`). Outside the
+  sandbox, Foundation logs an error to the standard error when a presenter's related file doesn't exist.
+- **Installing:** the sandboxed app can't write `/usr/local/bin`, so **Install Command Line Tool…** in the app menu
+  (`CommandLineTool`) shows and copies the `ln -s` command instead.
+
 ## Tests
 
 - **Hosted tests share the app's environment.** Unit tests run inside the sandboxed app (`TEST_HOST`), so `Bundle.main`
@@ -113,6 +140,14 @@ removed.
   `lightroom-sidecar.xmp` (a Lightroom Classic style sidecar).
 - **Predictor tests check stable subsets of tags.** Tags near the threshold, like "river" on the night photo, flip with
   the resampling method.
+- **`CommandLineToolTests` run the embedded command** with `Process`, which inherits the test host's sandbox. They pass
+  an allowlisted environment, because the runner's variables would:
+  - load XCTest into the command, which then ends the test run;
+  - mirror `os_log` to the standard error (`OS_ACTIVITY_DT_MODE`);
+  - make the command use the sandboxed file presenter.
+
+  `CFFIXED_USER_HOME` is kept, so Core ML caches the compiled model in the container. The suite is serialized: when
+  several commands create that cache at once, Core ML prints errors to the standard output.
 - **Compiler crash workaround:** Swift 6.3 crashed (`SendNonSendable` pass) on test closures passed to
   `withTemporaryDirectory` that captured a `UserDefaults`. Create such objects outside the closure.
 - **Sandboxed file access isn't covered by unit tests,** because the container has full access. Verify it end to end by

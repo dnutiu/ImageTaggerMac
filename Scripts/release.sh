@@ -99,6 +99,7 @@ echo "==> Checking the app"
 xcrun stapler validate -q "$APP" || fail "the app doesn't have a notarization ticket"
 spctl --assess --type execute "$APP" || fail "Gatekeeper rejects the app"
 syspolicy_check distribution "$APP"
+"$APP/Contents/Helpers/imagetagger" --version > /dev/null || fail "the imagetagger command doesn't run"
 
 VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$APP/Contents/Info.plist")
 DMG="$OUTPUT/ImageTagger-$VERSION.dmg"

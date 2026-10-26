@@ -111,7 +111,7 @@ struct TaggingSessionTests {
             try manager.copyItem(at: TestImage.timisoaraBega.url, to: directory.appendingPathComponent(".hidden.jpg"))
             try Data("notes".utf8).write(to: directory.appendingPathComponent("notes.txt"))
 
-            let files = await TaggingSession.imageFiles(in: [directory])
+            let files = await ImageFinder.imageFiles(in: [directory])
 
             #expect(files.map(\.lastPathComponent) == ["a.jpg", "b.jpg", "c.jpg"])
             #expect(TaggingSession.containsImagesOrFolders([directory]))

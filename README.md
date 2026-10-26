@@ -28,6 +28,8 @@ SwiftUI, with the tagging model running on Core ML.
   **Settings › Save tags to image files automatically**. See [Saving tags](#saving-tags).
 - Double-click an image, or press Return in the sidebar, to open it in the default viewer. The context menu can
   also show it in Finder or remove it from the list.
+- The `imagetagger` command tags the images in a folder from the Terminal and saves the tags to the files. See
+  [Command line](#command-line).
 
 ## Saving tags
 
@@ -46,6 +48,40 @@ and Windows show as keywords or tags. Existing keywords are kept, and tags that 
   atomically. Otherwise, when only the file was opened, it's rewritten in place.
 - The sandbox only gives access to the files the user opens. Sidecars are accessed with a file presenter, because
   `ImageTagger-Info.plist` declares the `xmp` extension as a related item type (`NSIsRelatedItemType`).
+
+## Command line
+
+The app includes the `imagetagger` command, which tags images and saves their tags to the files, like
+**Save Tags to All Images** in the app. To install it, choose **ImageTagger › Install Command Line Tool…** and run the
+command it shows in the Terminal. It links the command into `/usr/local/bin`:
+
+```shell
+sudo mkdir -p /usr/local/bin
+sudo ln -sf /Applications/ImageTagger.app/Contents/Helpers/imagetagger /usr/local/bin/imagetagger
+```
+
+Then run it in a folder of photos:
+
+```shell
+cd ~/Pictures/Trip
+imagetagger                                    # Tag the images in the folder and its subfolders, and save the tags
+imagetagger --dry-run                          # Only print the tags
+imagetagger --format hashtags IMG_1234.jpg Edits/
+```
+
+```
+IMG_1234.jpg: lake, nature, night, no people, outdoors, reflection, sky, water
+IMG_1235.CR2: architecture, building exterior, built structure, history, tower
+Saved the tags of 2 of 2 images.
+```
+
+- Each image's tags are printed as `<path>: <tags>`, in the order of the files. Errors and the summary are printed to
+  the standard error.
+- Tags are saved like in the app, see [Saving tags](#saving-tags). Images in formats that can't store keywords, like
+  PNG, are reported, but don't make the command fail.
+- The exit status is 1 if an image couldn't be read or its tags couldn't be saved, and 64 for invalid options.
+- Unlike the app, the command isn't sandboxed, so it can save tags to any file you can write. It uses the model in the
+  app, so it's updated with the app. If you move the app, install the command again.
 
 ## Requirements
 
@@ -141,6 +177,7 @@ gh secret set APP_STORE_CONNECT_ISSUER_ID --body <issuer ID>
 | `ImageTagger/Session` | The observable session: the list of images, the analysis queue, cancellation and actions. |
 | `ImageTagger/Views` | The SwiftUI sidebar, image preview and inspector. |
 | `ImageTagger/ImageTaggerCommands.swift` | The menu bar commands. |
+| `ImageTaggerCLI` | The `imagetagger` command. It's embedded in the app at `Contents/Helpers/imagetagger`, and compiles the files in `ImageTagger/Model`. |
 | `ImageTagger-Info.plist` | Declares the image and folder types the app can open, and XMP sidecars as related items. It's merged with the generated Info.plist. |
 | `Scripts` | Converts the ONNX model to Core ML, and builds notarized releases. |
 | `.github` | The CI and Release workflows. |

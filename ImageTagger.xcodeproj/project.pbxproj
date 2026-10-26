@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		0DC1A00B308F10000062CCB8 /* imagetagger in Embed Command Line Tool */ = {isa = PBXBuildFile; fileRef = 0DC1A001308F10000062CCB8 /* imagetagger */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		0DB7B024308E77920062CCB8 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -21,17 +25,59 @@
 			remoteGlobalIDString = 0DB7B010308E77910062CCB8;
 			remoteInfo = ImageTagger;
 		};
+		0DC1A00C308F10000062CCB8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0DB7B009308E77910062CCB8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0DC1A004308F10000062CCB8;
+			remoteInfo = ImageTaggerCLI;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		0DC1A00A308F10000062CCB8 /* Embed Command Line Tool */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Contents/Helpers;
+			dstSubfolderSpec = 1;
+			files = (
+				0DC1A00B308F10000062CCB8 /* imagetagger in Embed Command Line Tool */,
+			);
+			name = "Embed Command Line Tool";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		0DB7B011308E77910062CCB8 /* ImageTagger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ImageTagger.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0DB7B023308E77920062CCB8 /* ImageTaggerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ImageTaggerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0DB7B02D308E77920062CCB8 /* ImageTaggerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ImageTaggerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		0DC1A001308F10000062CCB8 /* imagetagger */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = imagetagger; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		0DC1A003308F10000062CCB8 /* Exceptions for "ImageTagger" folder in "ImageTaggerCLI" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Model/ImageAnalyzer.swift,
+				Model/ImageFinder.swift,
+				Model/ImageKeywords.swift,
+				Model/ImageLoader.swift,
+				Model/ImageMetadata.swift,
+				Model/TagFormat.swift,
+				Model/TagPredictor.swift,
+				Model/XMPSidecar.swift,
+			);
+			target = 0DC1A004308F10000062CCB8 /* ImageTaggerCLI */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		0DB7B013308E77910062CCB8 /* ImageTagger */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				0DC1A003308F10000062CCB8 /* Exceptions for "ImageTagger" folder in "ImageTaggerCLI" target */,
+			);
 			path = ImageTagger;
 			sourceTree = "<group>";
 		};
@@ -43,6 +89,11 @@
 		0DB7B030308E77920062CCB8 /* ImageTaggerUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = ImageTaggerUITests;
+			sourceTree = "<group>";
+		};
+		0DC1A002308F10000062CCB8 /* ImageTaggerCLI */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ImageTaggerCLI;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -69,6 +120,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		0DC1A006308F10000062CCB8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -76,6 +134,7 @@
 			isa = PBXGroup;
 			children = (
 				0DB7B013308E77910062CCB8 /* ImageTagger */,
+				0DC1A002308F10000062CCB8 /* ImageTaggerCLI */,
 				0DB7B026308E77920062CCB8 /* ImageTaggerTests */,
 				0DB7B030308E77920062CCB8 /* ImageTaggerUITests */,
 				0DB7B012308E77910062CCB8 /* Products */,
@@ -86,6 +145,7 @@
 			isa = PBXGroup;
 			children = (
 				0DB7B011308E77910062CCB8 /* ImageTagger.app */,
+				0DC1A001308F10000062CCB8 /* imagetagger */,
 				0DB7B023308E77920062CCB8 /* ImageTaggerTests.xctest */,
 				0DB7B02D308E77920062CCB8 /* ImageTaggerUITests.xctest */,
 			);
@@ -102,10 +162,12 @@
 				0DB7B00D308E77910062CCB8 /* Sources */,
 				0DB7B00E308E77910062CCB8 /* Frameworks */,
 				0DB7B00F308E77910062CCB8 /* Resources */,
+				0DC1A00A308F10000062CCB8 /* Embed Command Line Tool */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				0DC1A00D308F10000062CCB8 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				0DB7B013308E77910062CCB8 /* ImageTagger */,
@@ -163,6 +225,27 @@
 			productReference = 0DB7B02D308E77920062CCB8 /* ImageTaggerUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		0DC1A004308F10000062CCB8 /* ImageTaggerCLI */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0DC1A009308F10000062CCB8 /* Build configuration list for PBXNativeTarget "ImageTaggerCLI" */;
+			buildPhases = (
+				0DC1A005308F10000062CCB8 /* Sources */,
+				0DC1A006308F10000062CCB8 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				0DC1A002308F10000062CCB8 /* ImageTaggerCLI */,
+			);
+			name = ImageTaggerCLI;
+			packageProductDependencies = (
+			);
+			productName = imagetagger;
+			productReference = 0DC1A001308F10000062CCB8 /* imagetagger */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -184,6 +267,9 @@
 						CreatedOnToolsVersion = 26.6;
 						TestTargetID = 0DB7B010308E77910062CCB8;
 					};
+					0DC1A004308F10000062CCB8 = {
+						CreatedOnToolsVersion = 26.6;
+					};
 				};
 			};
 			buildConfigurationList = 0DB7B00C308E77910062CCB8 /* Build configuration list for PBXProject "ImageTagger" */;
@@ -203,6 +289,7 @@
 				0DB7B010308E77910062CCB8 /* ImageTagger */,
 				0DB7B022308E77920062CCB8 /* ImageTaggerTests */,
 				0DB7B02C308E77920062CCB8 /* ImageTaggerUITests */,
+				0DC1A004308F10000062CCB8 /* ImageTaggerCLI */,
 			);
 		};
 /* End PBXProject section */
@@ -253,6 +340,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		0DC1A005308F10000062CCB8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -265,6 +359,11 @@
 			isa = PBXTargetDependency;
 			target = 0DB7B010308E77910062CCB8 /* ImageTagger */;
 			targetProxy = 0DB7B02E308E77920062CCB8 /* PBXContainerItemProxy */;
+		};
+		0DC1A00D308F10000062CCB8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0DC1A004308F10000062CCB8 /* ImageTaggerCLI */;
+			targetProxy = 0DC1A00C308F10000062CCB8 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -539,6 +638,44 @@
 			};
 			name = Release;
 		};
+		0DC1A007308F10000062CCB8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
+				DEVELOPMENT_TEAM = UMVBF6DK83;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = nuculabs.dev.ImageTagger.imagetagger;
+				PRODUCT_MODULE_NAME = ImageTaggerCLI;
+				PRODUCT_NAME = imagetagger;
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		0DC1A008308F10000062CCB8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
+				DEVELOPMENT_TEAM = UMVBF6DK83;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = nuculabs.dev.ImageTagger.imagetagger;
+				PRODUCT_MODULE_NAME = ImageTaggerCLI;
+				PRODUCT_NAME = imagetagger;
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -574,6 +711,15 @@
 			buildConfigurations = (
 				0DB7B03E308E77920062CCB8 /* Debug */,
 				0DB7B03F308E77920062CCB8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0DC1A009308F10000062CCB8 /* Build configuration list for PBXNativeTarget "ImageTaggerCLI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0DC1A007308F10000062CCB8 /* Debug */,
+				0DC1A008308F10000062CCB8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
