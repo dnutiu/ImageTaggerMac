@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ImageTagger Support</title>
+  <meta name="description" content="Get help with ImageTagger for Mac: contact the developer, and find answers about saving tags, RAW files, Lightroom and the command line tool.">
+  <link rel="canonical" href="https://dnutiu.github.io/ImageTaggerMac/support/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="ImageTagger">
+  <meta property="og:title" content="ImageTagger Support">
+  <meta property="og:description" content="Contact the developer, and find answers about saving tags, RAW files, Lightroom and the command line tool.">
+  <meta property="og:url" content="https://dnutiu.github.io/ImageTaggerMac/support/">
+  <meta property="og:image" content="https://dnutiu.github.io/ImageTaggerMac/assets/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#fbfbfd" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0e0f13" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/icon.png">
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="../">
+        <img src="../assets/icon.png" alt="" width="30" height="30">
+        ImageTagger
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a class="optional" href="../#features">Features</a>
+        <a href="./" aria-current="page">Support</a>
+        <a href="../privacy/">Privacy</a>
+        <a href="https://github.com/dnutiu/ImageTaggerMac">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="page-hero">
+      <div class="wrap narrow">
+        <img src="../assets/icon.png" alt="" width="88" height="88">
+        <h1>ImageTagger Support</h1>
+        <p class="lede">How to reach the developer, and answers to common questions.</p>
+        <ul class="toc">
+          <li><a href="#contact">Contact</a></li>
+          <li><a href="#faq">Questions and answers</a></li>
+          <li><a href="#shortcuts">Keyboard shortcuts</a></li>
+        </ul>
+      </div>
+    </section>
+
+    <div class="wrap narrow prose">
+      <section class="contact" id="contact" aria-labelledby="contact-title">
+        <h2 id="contact-title">Contact</h2>
+        <p>To report a problem, suggest a feature or ask a question, email
+          <a href="mailto:contact@nuculabs.dev?subject=ImageTagger%20support">contact@nuculabs.dev</a>. You can also
+          open an issue on GitHub, where other people with the same question can find the answer.</p>
+        <div class="actions start">
+          <a class="button button-primary" href="mailto:contact@nuculabs.dev?subject=ImageTagger%20support">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7.5 8 6 8-6"/></svg>
+            Email support
+          </a>
+          <a class="button button-secondary" href="https://github.com/dnutiu/ImageTaggerMac/issues/new">Open an
+            issue</a>
+        </div>
+        <p class="fineprint">When you report a problem, please include your macOS version, the ImageTagger version
+          (ImageTagger › About ImageTagger), the format of the images, and the steps that lead to the problem.
+          GitHub issues are public, so don’t attach photos you don’t want to share there.</p>
+      </section>
+
+      <h2 id="faq">Questions and answers</h2>
+      <div class="faq">
+        <details>
+          <summary>Which images can ImageTagger open?</summary>
+          <div class="answer">
+            <p>The image formats macOS can read, including JPEG, HEIC, PNG, TIFF and the RAW files of most cameras
+              (CR2, CR3, NEF, ARW, RAF, ORF, RW2, DNG and others).</p>
+            <p>Add them with <strong>File › Add Images…</strong> (<kbd>⌘O</kbd>), by dragging images or
+              folders onto the window or the Dock icon, or with <strong>Open With › ImageTagger</strong> in Finder.
+              Folders are searched with all their subfolders.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Where are the tags saved?</summary>
+          <div class="answer">
+            <p>In the photo’s keywords, the field that Lightroom, Capture One, Photo Mechanic, Bridge, Spotlight and
+              Windows show as keywords or tags. They’re written to XMP <code>dc:subject</code>, and to the legacy
+              IPTC keywords too when the file already has them.</p>
+            <ul>
+              <li><strong>JPEG, HEIC and TIFF</strong> images get the keywords in the file. The image data is
+                copied as is, without being compressed again.</li>
+              <li><strong>RAW</strong> images get an XMP sidecar file with the same name, for example
+                <code>IMG_1234.xmp</code> for <code>IMG_1234.CR2</code>.</li>
+              <li><strong>PNG</strong> images are left unchanged, because macOS can’t save keywords to them.</li>
+            </ul>
+            <p>Save the tags of the selected image with <strong>File › Save Tags to File</strong>
+              (<kbd>⌘S</kbd>), or of every image with <strong>File › Save Tags to All Images…</strong>
+              (<kbd>⌥⌘S</kbd>).</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Does ImageTagger change my RAW files?</summary>
+          <div class="answer">
+            <p>No. RAW files are never modified: their keywords are saved to an XMP sidecar next to them. If a
+              sidecar already exists, only its keywords are updated, and its other metadata, like the develop
+              settings of your photo editor, is kept. A sidecar that can’t be read is never replaced.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Will saving tags remove my existing keywords?</summary>
+          <div class="answer">
+            <p>No. The tags are added to the keywords already in the file, and tags that are already there, in any
+              capitalization, aren’t added again. ImageTagger never removes keywords.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Lightroom doesn’t show the new keywords.</summary>
+          <div class="answer">
+            <p>Lightroom Classic reads keywords from the files when it imports photos. For photos that are already
+              in your catalog, select them and choose <strong>Metadata › Read Metadata from Files</strong>. This
+              replaces the metadata in the catalog with the metadata in the files.</p>
+            <p>Lightroom reads the metadata of DNG files from the DNG itself, so it doesn’t see the sidecars of DNG
+              files.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Can tags be saved automatically?</summary>
+          <div class="answer">
+            <p>Yes. Choose <strong>ImageTagger › Settings…</strong> and turn on <strong>Save tags to image files
+              automatically</strong>. Each image’s tags are then saved as soon as it’s analyzed.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>How do I copy tags for social media?</summary>
+          <div class="answer">
+            <p>Choose <strong>Hashtags</strong> under Format in the inspector, then copy the tags with the Copy Tags
+              button, <strong>Edit › Copy Tags</strong> (<kbd>⇧⌘C</kbd>), or
+              <kbd>⌘C</kbd> in the sidebar. Multi-word tags are joined, so <em>no people</em> becomes
+              <code>#nopeople</code>. Tags can also be separated by commas or spaces, and the format you choose is
+              remembered.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>How do I tag photos from the Terminal?</summary>
+          <div class="answer">
+            <p>Choose <strong>ImageTagger › Install Command Line Tool…</strong> and run the command it shows in the
+              Terminal. It links the <code>imagetagger</code> command into <code>/usr/local/bin</code>:</p>
+<pre>sudo mkdir -p /usr/local/bin
+sudo ln -sf /Applications/ImageTagger.app/Contents/Helpers/imagetagger /usr/local/bin/imagetagger</pre>
+            <p>Then run it in a folder of photos. It tags the images in the folder and its subfolders, and saves the
+              tags like the app does:</p>
+<pre>cd ~/Pictures/Trip
+imagetagger                                    # Tag the images and save the tags
+imagetagger --dry-run                          # Only print the tags
+imagetagger --format hashtags IMG_1234.jpg Edits/</pre>
+            <p>Run <code>imagetagger --help</code> to see all the options. The command uses the model in the app,
+              so if you move the app, install the command again.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Why are some tags wrong?</summary>
+          <div class="answer">
+            <p>The tags are predicted by a deep learning model that knows 1,708 keywords, so they’re suggestions.
+              Unusual subjects, or keywords the model doesn’t know, can give unexpected tags. Check them before you
+              save them to your files.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Are my photos uploaded anywhere?</summary>
+          <div class="answer">
+            <p>No. Photos are analyzed on your Mac, and the app doesn’t connect to the internet. ImageTagger
+              doesn’t collect any data. See the <a href="../privacy/">privacy policy</a>.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>What do I need to run ImageTagger?</summary>
+          <div class="answer">
+            <p>A Mac with Apple silicon or an Intel processor, running macOS 26.5 or later.</p>
+          </div>
+        </details>
+      </div>
+
+      <h2 id="shortcuts">Keyboard shortcuts</h2>
+      <table class="shortcuts">
+        <tbody>
+          <tr><th scope="row">Add images</th><td><kbd>⌘O</kbd></td></tr>
+          <tr><th scope="row">Save the tags of the selected image</th><td><kbd>⌘S</kbd></td></tr>
+          <tr><th scope="row">Save the tags of all images</th><td><kbd>⌥⌘S</kbd></td></tr>
+          <tr><th scope="row">Copy tags</th><td><kbd>⇧⌘C</kbd></td></tr>
+          <tr><th scope="row">Open with the default app</th><td><kbd>⌘↓</kbd></td></tr>
+          <tr><th scope="row">Show in Finder</th><td><kbd>⇧⌘R</kbd></td></tr>
+          <tr><th scope="row">Stop analyzing</th><td><kbd>⌘.</kbd></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <a class="brand" href="../">
+        <img src="../assets/icon.png" alt="" width="30" height="30" loading="lazy">
+        ImageTagger
+      </a>
+      <nav class="nav" aria-label="Footer">
+        <a href="./">Support</a>
+        <a href="../privacy/">Privacy</a>
+        <a href="https://github.com/dnutiu/ImageTaggerMac">GitHub</a>
+        <a href="https://blog.nuculabs.dev">Blog</a>
+      </nav>
+      <p>Copyright © Denis-Cosmin Nutiu. Licensed under the GNU GPL v3. Icon by
+        <a href="https://www.flaticon.com/free-icons/image-analysis">Dewi Sari on Flaticon</a>.</p>
+    </div>
+  </footer>
+</body>
+</html>
