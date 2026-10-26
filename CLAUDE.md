@@ -55,7 +55,8 @@ Scripts/release.sh [--publish <notes.md>] [--app <notarized ImageTagger.app>]
   folders become bundle resources.
 - **Info.plist:** `ImageTagger-Info.plist` is at the repo root, outside the synchronized folder, so it isn't copied as a
   resource. It's merged with the generated Info.plist and declares the image and folder document types the app opens
-  from Finder, plus `.xmp` as a related item type.
+  from Finder, plus `.xmp` as a related item type. `ITSAppUsesNonExemptEncryption = NO` answers App Store Connect's
+  export compliance question for every upload, because the app doesn't use encryption. Change it if it ever does.
 - **Core ML code generation is off** (`COREML_CODEGEN_LANGUAGE = None`). The model is loaded by URL as
   `TagPrediction.mlmodelc`.
 - **Swift 6 with `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor` and approachable concurrency.** Everything is main-actor

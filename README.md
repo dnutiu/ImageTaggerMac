@@ -182,7 +182,7 @@ gh secret set APP_STORE_CONNECT_ISSUER_ID --body <issuer ID>
 | `ImageTagger/Views` | The SwiftUI sidebar, image preview and inspector. |
 | `ImageTagger/ImageTaggerCommands.swift` | The menu bar commands. |
 | `ImageTaggerCLI` | The `imagetagger` command. It's embedded in the app at `Contents/Helpers/imagetagger`, and compiles the files in `ImageTagger/Model`. |
-| `ImageTagger-Info.plist` | Declares the image and folder types the app can open, and XMP sidecars as related items. It's merged with the generated Info.plist. |
+| `ImageTagger-Info.plist` | Declares the image and folder types the app can open, XMP sidecars as related items, and that the app doesn't use encryption (`ITSAppUsesNonExemptEncryption`). It's merged with the generated Info.plist. |
 | `Scripts` | Converts the ONNX model to Core ML, and builds notarized releases. |
 | `.github` | The CI and Release workflows. |
 | `docs` | The website, published with GitHub Pages from this folder on `main`: the landing page, the support page (the App Store support URL) and the privacy policy. It also holds the README's screenshots. |
