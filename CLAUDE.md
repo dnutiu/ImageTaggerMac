@@ -63,6 +63,11 @@ Scripts/release.sh [--publish <notes.md>] [--app <notarized ImageTagger.app>]
   heavy work (image decoding, inference, file writes) are `@concurrent`. Without `@concurrent`, a `nonisolated async`
   function runs on the caller's actor, which is usually the main actor.
 - **App Sandbox:** read-write access to user-selected files only (`ENABLE_USER_SELECTED_FILES = readwrite`).
+- **Privacy manifest:** `ImageTagger/PrivacyInfo.xcprivacy` declares no tracking and no collected data, and the
+  `UserDefaults` required reason API (`CA92.1`, the app's own defaults). Apps that use a required reason API without
+  declaring it aren't accepted by App Store Connect. If the app starts using another one (such as file timestamps,
+  disk space or system boot time) or sending data off the Mac, update the manifest, the App Store privacy answers and
+  `docs/privacy/index.html` together.
 - **Command line tool:** the `ImageTaggerCLI` target (folder `ImageTaggerCLI/`) builds `imagetagger`, which the app
   embeds at `Contents/Helpers/imagetagger` with code signing on copy.
   - **Shared files:** it compiles the `ImageTagger/Model` files through a membership exception set on the `ImageTagger`
