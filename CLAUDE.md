@@ -26,6 +26,9 @@ xcrun xcresulttool get test-results summary --path <path>.xcresult
 
 # Notarized DMG in build/release, and optionally a GitHub release (see README.md)
 Scripts/release.sh [--publish <notes.md>] [--app <notarized ImageTagger.app>]
+
+# App Store screenshots in AppStore/Screenshots, from the frames in AppStore/screenshots.html (needs Google Chrome)
+Scripts/app_store_screenshots.sh
 ```
 
 - **CI** (`.github/workflows/ci.yml`, `macos-26` runner with Xcode 26.6) runs the unit tests signed ad hoc

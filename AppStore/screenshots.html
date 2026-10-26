@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<!-- The App Store screenshots, 1440×900. Scripts/app_store_screenshots.sh renders each frame, by its ID, into AppStore/Screenshots. -->
+<style>
+  :root {
+    --ink: #16171c;
+    --muted: #5b5e6b;
+    --green: #22c55e;
+    --green-ink: #0d7a3a;
+    --sun: #ffc533;
+    --lavender: #f1f1f8;
+  }
+  html, body { margin: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; -webkit-font-smoothing: antialiased; }
+  .frame { display: none; position: relative; width: 1440px; height: 900px; overflow: hidden; color: var(--ink);
+    background: radial-gradient(circle at 88% 6%, #fff1cc 0, transparent 34%),
+                radial-gradient(circle at 6% 96%, #e2f5e9 0, transparent 34%), var(--lavender); }
+  .frame:target { display: block; }
+  .frame.dark { color: #eceef3;
+    background: radial-gradient(circle at 50% 0%, rgb(74 222 128 / 0.16) 0, transparent 46%), #0e0f13; }
+
+  .head { position: absolute; left: 0; right: 0; top: 58px; text-align: center; }
+  h1 { margin: 0 auto; max-width: 1100px; font-size: 56px; line-height: 1.06; letter-spacing: -0.032em; font-weight: 700; }
+  .head p { margin: 16px auto 0; max-width: 900px; font-size: 24px; line-height: 1.4; color: var(--muted); }
+  .dark .head p { color: #a3a6b4; }
+
+  .window { position: absolute; left: 50%; top: 236px; width: 1120px; transform: translateX(-50%); }
+  .window img { display: block; width: 100%; }
+
+  .tag { position: absolute; display: inline-flex; align-items: center; gap: 9px; padding: 9px 18px 9px 14px;
+    border: 2px solid var(--ink); border-radius: 999px; background: #fff; color: var(--ink);
+    font-size: 21px; font-weight: 650; box-shadow: 0 10px 28px rgb(22 23 28 / 0.12); }
+  .tag::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--green); }
+  .tag.sun::before { background: var(--sun); }
+
+  .badges { display: flex; justify-content: center; gap: 12px; margin-top: 24px; }
+  .badge { display: inline-flex; align-items: center; gap: 9px; padding: 9px 16px; border-radius: 999px;
+    background: rgb(255 255 255 / 0.08); border: 1px solid rgb(255 255 255 / 0.14); font-size: 18px; font-weight: 600; }
+  .badge svg { width: 20px; height: 20px; fill: none; stroke: #4ade80; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  .card { position: absolute; background: #fff; border-radius: 22px; color: var(--ink);
+    box-shadow: 0 2px 4px rgb(22 23 28 / 0.06), 0 24px 60px rgb(22 23 28 / 0.18); }
+  .files { width: 540px; padding: 10px; }
+  .file { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 16px; padding: 18px 16px; }
+  .file + .file { border-top: 1px solid #e2e3eb; }
+  .file svg { width: 28px; height: 28px; fill: none; stroke: var(--muted); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .file-name { font: 21px ui-monospace, "SF Mono", Menlo, monospace; }
+  .pill { padding: 6px 13px; border-radius: 999px; font-size: 16px; font-weight: 650; background: #ececf5; color: var(--muted); }
+  .pill.green { background: #e2f5e9; color: var(--green-ink); }
+  .pill.sun { background: #fff1cc; color: var(--ink); }
+
+  .formats { width: 560px; padding: 26px; }
+  .segmented { display: inline-flex; padding: 4px; border-radius: 12px; background: #ececf5; }
+  .segmented span { padding: 7px 18px; border-radius: 9px; font-size: 18px; font-weight: 600; color: var(--muted); }
+  .segmented .on { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgb(0 0 0 / 0.14); }
+  .output { margin-top: 18px; padding: 18px 20px; border-radius: 14px; background: #ececf5; font-size: 22px; line-height: 1.55; }
+  .output b { color: var(--green-ink); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- 1. The main window with the tags of a photo. -->
+<section class="frame" id="1-keywords-for-every-photo">
+  <div class="head">
+    <h1>Keywords for every photo,<br>without typing one.</h1>
+    <p>ImageTagger suggests tags with a deep learning model that runs on your Mac.</p>
+  </div>
+  <div class="window"><img src="../docs/screenshot-light.png" alt=""></div>
+  <span class="tag" style="left: 96px; top: 340px">flower</span>
+  <span class="tag sun" style="left: 60px; top: 560px">no people</span>
+  <span class="tag" style="left: 120px; top: 780px">nature</span>
+  <span class="tag sun" style="right: 40px; top: 300px">outdoors</span>
+  <span class="tag" style="right: 70px; top: 780px">leaf</span>
+</section>
+
+<!-- 2. Privacy, in dark mode. -->
+<section class="frame dark" id="2-photos-stay-on-your-mac">
+  <div class="head">
+    <h1>Your photos stay on your Mac.</h1>
+    <div class="badges">
+      <span class="badge"><svg viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3"/></svg>Runs on your Mac</span>
+      <span class="badge"><svg viewBox="0 0 24 24"><path d="M12 3 5 6v5.5c0 4.4 3 8 7 9.5 4-1.5 7-5.1 7-9.5V6z"/><path d="m9 12 2.2 2.2L15.5 10"/></svg>No data collected</span>
+      <span class="badge"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/></svg>No accounts or uploads</span>
+    </div>
+  </div>
+  <div class="window"><img src="../docs/screenshot-dark.png" alt=""></div>
+</section>
+
+<!-- 3. Saving: keywords in the file, sidecars for RAW. -->
+<section class="frame" id="3-keywords-where-apps-find-them">
+  <div class="head">
+    <h1>Keywords where your photo apps find them.</h1>
+    <p>Saved in JPEG, HEIC and TIFF files, and in XMP sidecars next to RAW files.</p>
+  </div>
+  <div class="window"><img src="../docs/screenshot-light.png" alt=""></div>
+  <div class="card files" style="left: 90px; top: 520px">
+    <div class="file">
+      <svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="m8 18 2.8-3.6 2 2.4 1.4-1.6L16 18"/></svg>
+      <span class="file-name">DSCF5857.jpeg</span><span class="pill green">Keywords inside</span>
+    </div>
+    <div class="file">
+      <svg viewBox="0 0 24 24"><path d="M4 8.5h3l1.8-2.5h6.4L17 8.5h3a1 1 0 0 1 1 1V19a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.8" r="3.4"/></svg>
+      <span class="file-name">DSCF5858.RAF</span><span class="pill">Never modified</span>
+    </div>
+    <div class="file">
+      <svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 16.5h4"/></svg>
+      <span class="file-name">DSCF5858.xmp</span><span class="pill sun">Sidecar with keywords</span>
+    </div>
+  </div>
+</section>
+
+<!-- 4. Copying tags as hashtags. -->
+<section class="frame" id="4-catalog-or-next-post">
+  <div class="head">
+    <h1>Ready for your catalog, or your next post.</h1>
+    <p>Copy tags separated by commas or spaces, or as hashtags.</p>
+  </div>
+  <div class="window"><img src="../docs/screenshot-light.png" alt=""></div>
+  <div class="card formats" style="right: 80px; top: 470px">
+    <div class="segmented"><span>Comma</span><span>Space</span><span class="on">Hashtags</span></div>
+    <div class="output"><b>#close #day #flower #freshness #growth #leaf #nature #nopeople #outdoors #petal #plant</b></div>
+  </div>
+</section>
+
+</body>
+</html>

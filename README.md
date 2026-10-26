@@ -161,6 +161,15 @@ Connect**. Release builds leave out the `imagetagger` command, which isn't sandb
 is. `Scripts/release.sh` builds with `EMBEDS_COMMAND_LINE_TOOL=YES` to include it in the DMG, and the
 **Install Command Line Tool…** menu item is only shown when the app includes it.
 
+The App Store screenshots are in `AppStore/Screenshots`. Each one is a frame in `AppStore/screenshots.html` that
+combines a screenshot of the app with a headline. After changing the frames or the app screenshots in `docs`, render
+them again with Google Chrome:
+
+```shell
+Scripts/app_store_screenshots.sh           # 1440×900
+SCALE=2 Scripts/app_store_screenshots.sh   # 2880×1800, for app screenshots at least twice as large
+```
+
 ### GitHub Actions
 
 The **CI** workflow builds the app and runs the unit tests for every push to `main` and every pull request. The model is
@@ -194,7 +203,8 @@ gh secret set APP_STORE_CONNECT_ISSUER_ID --body <issuer ID>
 | `ImageTagger/ImageTaggerCommands.swift` | The menu bar commands. |
 | `ImageTaggerCLI` | The `imagetagger` command. It's embedded in the app at `Contents/Helpers/imagetagger`, and compiles the files in `ImageTagger/Model`. |
 | `ImageTagger-Info.plist` | Declares the image and folder types the app can open, XMP sidecars as related items, and that the app doesn't use encryption (`ITSAppUsesNonExemptEncryption`). It's merged with the generated Info.plist. |
-| `Scripts` | Converts the ONNX model to Core ML, and builds notarized releases. |
+| `Scripts` | Converts the ONNX model to Core ML, builds notarized releases, and renders the App Store screenshots. |
+| `AppStore` | The App Store screenshots, and the page they're rendered from. |
 | `.github` | The CI and Release workflows. |
 | `docs` | The website, published with GitHub Pages from this folder on `main`: the landing page, the support page (the App Store support URL) and the privacy policy. It also holds the README's screenshots. |
 
